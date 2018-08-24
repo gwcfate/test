@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        .map{
+            width: 600px;
+            height: 600px;
+            background-color: #ccc;
+            margin: 0 auto;
+            position: relative;
+            overflow: hidden;
+        }
+        button{
+            display: block;
+            margin: 0 auto;
+        }
+    </style>
+    <!-- 引入食物对象 -->
+    <script src="./食物.js"></script>
+    <script src="./蛇.js"></script>
+</head>
+<body>
+    <button>停止按钮</button>
+    <div class="map"></div>
+
+    <script>
+        
+        // 0.获取对象
+        var map = document.querySelector('.map');
+        var btn = document.querySelector('button');
+        var ib = document.querySelector('i');
+        var score = 0;
+
+        // 1.获取食物对象
+        var food = new Food();
+        console.log(food);
+
+        //2 食物渲染
+        food.render(map);
+        
+        //3.蛇对象
+        var snake = new Snake();
+
+        //4. 蛇渲染
+        snake.render(map);
+        
+    </script>
+</body>
+</html>
