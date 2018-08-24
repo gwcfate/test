@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <style>
+    body,
+    ul,
+    ol,
+    li,
+    img {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+
+    #box {
+        width: 490px;
+        height: 264px;
+        padding: 5px;
+        position: relative;
+        border: 1px solid #ccc;
+        margin: 100px auto 0;
+    }
+
+    .ad {
+        width: 490px;
+        height: 100%;
+        overflow: hidden;
+        position: relative;
+    }
+
+    #box img {
+        width: 490px;
+    }
+
+    .ad ol {
+        position: absolute;
+        right: 10px;
+        bottom: 10px;
+    }
+
+    .ad ol li {
+        width: 20px;
+        height: 20px;
+        line-height: 20px;
+        border: 1px solid #ccc;
+        text-align: center;
+        background: #fff;
+        float: left;
+        margin-right: 10px;
+        cursor: pointer;
+        _display: inline;
+    }
+
+    .ad ol li.current {
+        background: yellow;
+    }
+
+    .ad ul li {
+        float: left;
+        position: relative;
+    }
+
+    .ad ul {
+        position: absolute;
+        top: 0;
+        width: 2940px;
+    }
+
+    .ad ul li.current {
+        display: block;
+    }
+
+    #arr {
+        display: none;
+    }
+
+    #arr span {
+        width: 40px;
+        height: 40px;
+        position: absolute;
+        left: 5px;
+        top: 50%;
+        margin-top: -20px;
+        background: #000;
+        cursor: pointer;
+        line-height: 40px;
+        text-align: center;
+        font-weight: bold;
+        font-family: '黑体';
+        font-size: 30px;
+        color: #fff;
+        opacity: 0.3;
+        border: 1px solid #fff;
+    }
+
+    #arr #right {
+        right: 5px;
+        left: auto;
+    }
+
+    h2 {
+        position: absolute;
+        width: 100%;
+        text-align: center;
+        top: 0;
+        font-size: 60px;
+        color: lime;
+    }
+
+    .point {
+        position: absolute;
+        right: 5%;
+        bottom: 0;
+        height: 30px;
+    }
+
+    .point li {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background-color: #000;
+        float: left;
+        margin: 2px;
+        cursor: pointer;
+    }
+
+    .point li.current {
+        background-color: #f99;
+    }
+    </style>
+</head>
+
+<body>
+    <div id="box" class="all">
+        <div class="ad">
+            <ul id="imgList">
+                <li><img src="images/1.jpg" />
+                    <h2>1</h2></li>
+                <li><img src="images/2.jpg" />
+                    <h2>2</h2></li>
+                <li><img src="images/3.jpg" />
+                    <h2>3</h2></li>
+                <li><img src="images/4.jpg" />
+                    <h2>4</h2></li>
+                <li><img src="images/5.jpg" />
+                    <h2>5</h2></li>
+            </ul>
+        </div>
+        <div id="arr">
+            <span id="left">&lt;</span>
+            <span id="right">&gt;</span>
+        </div>
+        <ol class="point" id="point">
+            <!-- 小圆点,动态生成 -->
+        </ol>
+    </div>
+
+    
+    <script src="jquery-1.12.4.js"></script>
+    <script>
+    $(function() {
+
+        // 找对象
+        var $box = $("#box"); // 整个父盒子
+        var $arr = $("#arr"); // 箭头容器
+        var $leftArr = $("#left"); // 左箭头
+        var $rightArr = $("#right"); // 右箭头
+        var $ul = $("#imgList"); // ul容器
+        var $liW = $ul.children("li").eq(0).width(); // li的宽度
+        var timer = null; // 定时器id
+        var $point = $("#point"); // 小圆点的容器
+
+        // 遍历li的个数来生成小圆点
+        $ul.children("li").each(function(i, ele) {
+            var $olLis = $("<li></li>");
+            if (i === 0) {
+                // 第一个li添加current，表示当前的li
+                $olLis.addClass("current");
+            }
+            // 添加到容器内
+            $point.append($olLis);
+        })
+
+        // 小圆点li元素
+        var $olLis = $point.children("li");
+
+        // 将第一张图片克隆一份添加到最后一张，作为假图片
+        $ul.children("li").eq(0).clone().appendTo($ul);
+        // 注意：获取所有的li元素，需要在添加克隆之后，才能获取正确的所有的li
+        var $lis = $ul.children("li"); // 获取到所有的li元素（包括克隆的li元素）
+
+        // 给#box注册mouseenter事件，让箭头显示，清除定时器
+        $box.on("mouseenter", function() {
+            $arr.show();
+            clearInterval(timer);
+        })
+
+        // 给#box注册mouseleave事件，让箭头隐藏，重开定时器
+        $box.on("mouseleave", function() {
+            $arr.hide();
+            timer = setInterval(function() {
+                $rightArr.click();
+            }, 2000);
+        })
+
+
+        // 更换小圆点
+        function changePoint() {
+            // 临界点判断，如果count是最后一张假图片的时候，需要让小圆点是第一个高亮
+            if (count >= $lis.length - 1) {
+                $olLis.eq(0).addClass("current").siblings().removeClass("current");
+            } else {
+                $olLis.eq(count).addClass("current").siblings().removeClass("current");
+            }
+        }
+
+        // 小圆点点击事件
+        $olLis.on("click", function() {
+            // 获取当前下标
+            var index = $(this).index();
+
+            // 判断，是调用左箭头的事件，还是右箭头的事件
+            if (index < count) {
+                // 由于左箭头内部会将count--，所以这里需要让index+1， 赋值给count
+                count = index + 1;
+                $leftArr.click();
+            } else if (index > count) {
+                // 由于由箭头内部会将count++，所以这里需要让index-1， 赋值给count
+                count = index - 1;
+                $rightArr.click();
+            }
+        })
+
+        // 给右箭头注册点击事件
+        var count = 0;
+        // 默认点击是可切换的
+        var flag = true;
+        // 右箭头click
+        $rightArr.on("click", function() {
+            if (!flag) {
+                return;
+            }
+
+            // 标识为不可点击了
+            flag = false;
+
+            // 点一次，就要往左边移动一张图片
+            // 如果发现现在是最后一张图片，悄悄摸摸的将ul瞬移left为0的位置
+            if (count >= $lis.length - 1) {
+                // 需要把count下标在从零开始累加
+                count = 0;
+                // 瞬间拉回去,把假图片顺便变成了真图片
+                $ul.css("left", 0);
+            }
+
+            // 如果以上if条件不成立，就说明不是最后一张假图，需要让count++
+            count++;
+            // 同步小圆点
+            changePoint();
+
+            // 并且根据当前的count和盒子的宽度计算ul的left位置
+            $ul.stop().animate({
+                left: -count * $liW
+            }, 500, "linear", function() {
+                // 当此次动画运动结束的时候，将flag在变成true
+                flag = true;
+            });
+        })
+
+        // 给左箭头注册点击事件
+        $leftArr.on("click", function() {
+            if (!flag) {
+                return;
+            }
+
+            // 标识为不可点击了
+            flag = false;
+
+            if (count <= 0) {
+                //悄悄摸摸的把真图片换成假图片
+                count = $lis.length - 1;
+                $ul.css({
+                    left: -count * $liW
+                });
+
+            }
+
+            count--;
+            // 同步小圆点
+            changePoint();
+            $ul.stop().animate({
+                left: -count * $liW
+            }, 500, "linear", function() {
+                flag = true;
+            })
+        })
+
+        // 开一个定时器，每隔2秒钟点一次
+        timer = setInterval(function() {
+            $rightArr.click();
+        }, 2000);
+    })
+    </script>
+</body>
+
+</html>
